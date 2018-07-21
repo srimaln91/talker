@@ -17,11 +17,14 @@
             var socket = io.connect('http://localhost:4000');
 
             socket.on('connect', function(data) {
-                socket.emit('join', 'Hello World from client');
+                socket.emit('join', 'Hi server. I\'m connected');
             });
 
+            socket.on('connect', function(data) {
+                socket.emit('join', 'Hi server. I\'m connected');
+            });
             socket.on('messages', function(data){
-                alert(data);
+                console.log("message event");
             });
 
             $('form').submit(function(e){
