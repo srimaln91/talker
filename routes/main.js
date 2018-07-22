@@ -1,4 +1,5 @@
 'use strict';
+const registrationController = require('../controllers/user/register');
 
 class Routes {
 
@@ -11,11 +12,13 @@ class Routes {
     appRoutes() {
         this.app.get('/', (req, res, next) => {
             res.render('index');
-        })
+        });
+
+        this.app.post('/registration', registrationController);
     }
 
     socketEvents() {
-        
+
         this.io.on('connection', (client) => {
 
             console.log('client connected');
@@ -28,17 +31,26 @@ class Routes {
                 console.log(data);
                 this.io.emit('messages', 'Hello from server');
             });
-        
+
+            client.on('disconnect', () => {
+                // var disconClientIdIndex = this.ioClients.indexOf(client.id);
+                this.ioClients = this.ioClients.filter((item) => {
+                    return item !== client.id;
+                })
+            });
+
             client.on('messages', (data) => {
-        
-                // io.to(clients[0]).emit('privatemsg', 'Im one');
-                // io.to(clients[1]).emit('privatemsg', 'Hy there. Im 222');
-                
+
+                this.ioClients.forEach((clientId) => {
+                    this.io.to(clientId).emit('privatemsg', 'Test Private Msg');
+                });
+
                 this.io.emit('broad', data);
-                if(typeof(this.io.broadcast != 'undefined')) {
+
+                if(typeof(this.io.broadcast) != 'undefined') {
                     this.io.broadcast.emit('broad',data);
                 }
-                
+
             });
 
         });
