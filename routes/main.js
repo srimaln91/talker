@@ -1,4 +1,5 @@
 'use strict';
+const registrationController = require('../controllers/user/register');
 
 class Routes {
 
@@ -11,11 +12,13 @@ class Routes {
     appRoutes() {
         this.app.get('/', (req, res, next) => {
             res.render('index');
-        })
+        });
+
+        this.app.post('/registration', registrationController);
     }
 
     socketEvents() {
-        
+
         this.io.on('connection', (client) => {
 
             console.log('client connected');
@@ -35,9 +38,9 @@ class Routes {
                     return item !== client.id;
                 })
             });
-        
+
             client.on('messages', (data) => {
-        
+
                 this.ioClients.forEach((clientId) => {
                     this.io.to(clientId).emit('privatemsg', 'Test Private Msg');
                 });
@@ -47,7 +50,7 @@ class Routes {
                 if(typeof(this.io.broadcast) != 'undefined') {
                     this.io.broadcast.emit('broad',data);
                 }
-                
+
             });
 
         });
