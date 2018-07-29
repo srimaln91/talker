@@ -1,3 +1,5 @@
+'use strict';
+
 var bcrypt = require('bcrypt');
 
 var User = require('../../models/user');
@@ -11,9 +13,9 @@ var controller = (req, res, next) => {
 
     var user = new User({
       name: {
-        fname: params.firstname,
-        lname: params.lastname,
-        uname: params.username
+        fname: params.name.fname,
+        lname: params.name.lname,
+        uname: params.name.uname
       },
       email: params.email,
       password: hash
@@ -23,7 +25,8 @@ var controller = (req, res, next) => {
       if(err) {
         handleError(res, err, "Invalid Data", 401);
       }
-      res.status(200);
+
+      res.json({success: true});
       res.end();
 
     });

@@ -9,7 +9,7 @@ var User = new Schema({
     uname: String
   },
   email: String,
-  password: String,
+  password: {type: String, select: false},
   createdDate: {type: Date, default: Date.now()}
 });
 

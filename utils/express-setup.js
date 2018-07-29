@@ -2,6 +2,7 @@
 
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
+var cors = require('cors');
 
 class Config {
 
@@ -17,6 +18,9 @@ class Config {
 
     //Static path
     app.use(require('express').static(require('path').join('public_data')));
+
+    //CORS setup
+    app.use(cors());
 
     //Body parser
     app.use(bodyParser.json());

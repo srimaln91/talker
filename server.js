@@ -2,11 +2,13 @@
 
 const express = require('express');
 const http = require('http');
-const socket = require('socket.io');
 const mongoose = require('mongoose');
+const redis = require("redis");
 
 const expressSetup = require('./utils/express-setup');
 const router = require('./routes/main');
+const SocketManager = require('./routes/sockers');
+
 const config = require('./utils/config');
 
 class Server {
@@ -14,7 +16,6 @@ class Server {
   constructor() {
     this.app = express();
     this.server = http.createServer(this.app);
-    this.io = socket(this.server);
   }
 
   /**
@@ -31,8 +32,8 @@ class Server {
    * Register app routes
    */
   appRouteSetup() {
-    var routes = new router(this.app, this.io);
-    routes.init();
+    new router(this.app);
+    new SocketManager(this.server, this.redisClient);
   }
 
   /**
@@ -42,7 +43,8 @@ class Server {
 
     var mongoOptions = { useNewUrlParser: true };
 
-    mongoose.connect(config.database.connString, mongoOptions).then(() => {
+    mongoose.connect(config.database.connString, mongoOptions)
+    .then(() => {
       console.info("Database Connected.");
       this.startServer();
     }).catch((err) => {
@@ -69,12 +71,26 @@ class Server {
 
   }
 
+  startRedisClient() {
+
+    this.redisClient = redis.createClient();
+
+    this.redisClient.on("error", function (err) {
+      console.log("Error " + err);
+    });
+
+    this.redisClient.on('connect', function () {
+      console.log('Redis connected.');
+    });
+
+  }
   /**
    * Bootstrap the application
    */
   runApp() {
 
     this.appConfig();
+    this.startRedisClient();
     this.appRouteSetup();
     this.initializeDatabase();
   }
