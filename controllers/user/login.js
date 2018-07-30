@@ -13,7 +13,7 @@ var controller = (req, res, next) => {
 
   //Get user from database
   User.findOne({email: params.user})
-  .select('+password')
+  .select("+password")
   .then(user => {
     bcrypt.compare(params.password, user.password)
     .then(success => {
@@ -39,7 +39,9 @@ var controller = (req, res, next) => {
         res.json({success: false, message: "Incorrect credentials"});
       }
     })
-    .catch(err => console.log)
+    .catch(err => {
+      handleError(res, err, "Invalid Data", 401);
+    })
   })
   .catch(err => {
     handleError(res, err, "Invalid Data", 401);
