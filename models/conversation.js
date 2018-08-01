@@ -9,7 +9,8 @@ var conversation = new Schema({
   messages: [{type: mongoose.Schema.Types.ObjectId, ref:'Message'}],
   created_at: { type: Date, default: Date.now()},
   updated_at: { type: Date, default: Date.now },
-  is_group: { type: Boolean, default: false}
+  is_group: { type: Boolean, default: false},
+  hostUser: {type: mongoose.Schema.Types.ObjectId, ref:'User'}
 });
 
 module.exports = mongoose.model('Conversation', conversation);

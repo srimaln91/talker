@@ -25,7 +25,8 @@ var controller = async (req, res, next) => {
 
         var conversation = new Conversation({
           name: params.name,
-          users: users
+          users: users,
+          hostUser: users[0]
         });
 
         conversation.save()
