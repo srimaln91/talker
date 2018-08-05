@@ -1,4 +1,6 @@
 const socket = require('socket.io');
+const Conversation = require('../models/conversation');
+const Message = require('../models/message');
 
 class SocketManager {
 
@@ -17,17 +19,32 @@ class SocketManager {
 
       // this.ioClients.push(client.id);
       client.on('userid', (userId) => {
-        this.redisClient.set(client.id, userId);
+        this.redisClient.set(userId, client.id );
       });
 
-      // client.on('join', (data) => {
-      //   console.log(data);
-      //   this.io.emit('messages', 'Hello from server');
-      // });
+      client.on('room', (roomId) => {
+        console.log("Joined Room : " + roomId);
+        client.join(roomId);
+      });
 
-      client.on('new-message', (data) => {
-        console.log(data);
-        this.io.emit('new-message', data);
+      client.on('new-message', (newMessage) => {
+
+        //Get recipients
+        Conversation.findById(newMessage.conversation)
+        .select({users: 1})
+        .then(conversation => {
+          this.io.to(conversation._id).emit('new-message', newMessage);
+          var message = new Message({
+            conversation: conversation,
+            from: newMessage.from,
+            message_body: newMessage.message_body
+          });
+          message.save();
+        })
+        .catch(err => {
+          console.log(err);
+        });
+
       });
 
       client.on('disconnect', () => {

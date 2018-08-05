@@ -16,7 +16,7 @@ var controller = async (req, res, next) => {
     //Check for existing conversations
     Conversation.findOne().where({ users: users }).then(oldConversation => {
 
-      if (oldConversation !== null) {
+      if (oldConversation) {
 
         res.json({ conversation: oldConversation, success: true, isNew: false });
         res.end();
